@@ -14,8 +14,7 @@ type MockSignatures = MethodSignatures<MockRedisClient>;
 type Diff = {
   [K in keyof MockSignatures as Uppercase<K>]: K extends keyof RealSignatures
     ? MockSignatures[K] extends RealSignatures[K]
-      ? // ? never
-        RealSignatures[K] extends MockSignatures[K]
+      ? RealSignatures[K] extends MockSignatures[K]
         ? never
         : Uppercase<K>
       : Uppercase<K>

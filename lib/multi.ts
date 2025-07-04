@@ -1,27 +1,35 @@
 import type { MockRedisClient } from './MockRedis';
+import { ReplyUnion } from './types';
 
-type Batchify<T> = {
-  [K in keyof T]: T[K] extends (...args: infer A) => unknown
-    ? (...args: A) => Batchify<T>
+type Batchify<REPLIES extends unknown[], T> = {
+  [K in keyof T]: T[K] extends (...args: infer A) => infer B
+    ? (...args: A) => Batchify<[...REPLIES, Awaited<B>], T>
     : T[K] extends object
-      ? Batchify<T[K]>
+      ? Batchify<REPLIES, T[K]>
       : never;
 } & {
-  exec(): Promise<unknown[]>;
+  exec<T extends 'generic' | 'typed' = 'generic'>(): Promise<
+    T extends 'typed' ? REPLIES : ReplyUnion[]
+  >;
 };
 
 type OmitByUppercase<T, K extends string> = {
   [P in keyof T as Uppercase<P & string> extends K ? never : P]: T[P];
 };
 
-type RedisMultiClient = Batchify<OmitByUppercase<MockRedisClient, 'MULTI'>>;
+type RedisMultiClient<REPLIES extends unknown[]> = Batchify<
+  REPLIES,
+  OmitByUppercase<MockRedisClient, 'MULTI'>
+>;
 
 type MethodCall = {
   path: string[];
   args: unknown[];
 };
 
-export function multi(this: MockRedisClient): RedisMultiClient {
+export function multi<REPLIES extends unknown[] = []>(
+  this: MockRedisClient
+): RedisMultiClient<REPLIES> {
   const calls: MethodCall[] = [];
   const self = this;
 
@@ -81,5 +89,5 @@ export function multi(this: MockRedisClient): RedisMultiClient {
     );
   }
 
-  return makeProxy([], this) as RedisMultiClient;
+  return makeProxy([], this) as RedisMultiClient<REPLIES>;
 }
