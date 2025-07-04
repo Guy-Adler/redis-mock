@@ -10,7 +10,11 @@ type Batchify<T> = {
   exec(): Promise<unknown[]>;
 };
 
-type RedisMultiClient = Batchify<Omit<MockRedisClient, 'multi'>>;
+type OmitByUppercase<T, K extends string> = {
+  [P in keyof T as Uppercase<P & string> extends K ? never : P]: T[P];
+};
+
+type RedisMultiClient = Batchify<OmitByUppercase<MockRedisClient, 'MULTI'>>;
 
 type MethodCall = {
   path: string[];
