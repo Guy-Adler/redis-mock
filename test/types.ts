@@ -11,7 +11,7 @@ type MethodSignatures<T> = Pick<T, MethodKeys<T>>;
 type RealSignatures = MethodSignatures<RedisClientType>;
 type MockSignatures = MethodSignatures<MockRedisClient>;
 
-type Diff = {
+type FullDiff = {
   [K in keyof MockSignatures as Uppercase<K>]: K extends keyof RealSignatures
     ? MockSignatures[K] extends RealSignatures[K]
       ? RealSignatures[K] extends MockSignatures[K]
@@ -21,6 +21,14 @@ type Diff = {
     : Uppercase<K>;
 }[Uppercase<keyof MockSignatures>];
 
+/**
+ * Some commands simply can not have the same type in a reasonable way.
+ * After manual testing, we can choose to ignore them.
+ */
+type ImpossibleFunctions = 'MULTI';
+
+type Diff = Exclude<FullDiff, ImpossibleFunctions>;
+
 type MustBeNever<T extends never> = T;
 export type Expect = MustBeNever<Diff>;
 
@@ -29,8 +37,7 @@ type BadKeyFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/keys'
 type BadSetsFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/sets')>>;
 type BadStringsFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/strings')>>;
 type BadEvalFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/eval')>>;
-type BadMultiFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/multi')>>;
 type OtherBadFunctions = Exclude<
   Diff,
-  BadKeyFunctions | BadSetsFunctions | BadStringsFunctions | BadEvalFunctions | BadMultiFunctions
+  BadKeyFunctions | BadSetsFunctions | BadStringsFunctions | BadEvalFunctions
 >;
