@@ -1,24 +1,41 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import type { RedisClientType } from 'redis';
 import { MockRedisClient } from '../lib';
 
-// Extract method signatures
-type MethodKeys<T> = {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  [K in keyof T]: T[K] extends Function ? K : never;
+type MethodPath<Prefix extends string, Name extends string> = Prefix extends ''
+  ? Name
+  : `${Prefix}.${Name}`;
+
+type ExtractMethodPaths<T, Prefix extends string = ''> = {
+  [K in keyof T]: T[K] extends Function
+    ? MethodPath<Prefix, Extract<K, string>> // method found
+    : T[K] extends object
+      ? ExtractMethodPaths<T[K], MethodPath<Prefix, Extract<K, string>>> // recurse
+      : never;
 }[keyof T];
 
-type MethodSignatures<T> = Pick<T, MethodKeys<T>>;
+type Lookup<T, Path extends string> = Path extends `${infer CurrentLevel}.${infer Rest}`
+  ? CurrentLevel extends keyof T
+    ? Lookup<T[CurrentLevel], Rest>
+    : never
+  : Path extends keyof T
+    ? T[Path]
+    : never;
+
+type MethodSignatures<T> = {
+  [K in ExtractMethodPaths<T>]: Lookup<T, K> extends Function ? Lookup<T, K> : never;
+};
 type RealSignatures = MethodSignatures<RedisClientType>;
 type MockSignatures = MethodSignatures<MockRedisClient>;
 
 type FullDiff = {
   [K in keyof MockSignatures as Uppercase<K>]: K extends keyof RealSignatures
-    ? MockSignatures[K] extends RealSignatures[K]
-      ? RealSignatures[K] extends MockSignatures[K]
+    ? RealSignatures[K] extends MockSignatures[K]
+      ? MockSignatures[K] extends RealSignatures[K]
         ? never
-        : Uppercase<K>
-      : Uppercase<K>
-    : Uppercase<K>;
+        : Uppercase<K> // valid code in mock isn't valid in node-redis
+      : Uppercase<K> // valid code in node-redis isn't valid in mock
+    : Uppercase<K>; // doesn't exist in node-redis
 }[Uppercase<keyof MockSignatures>];
 
 /**
