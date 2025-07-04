@@ -17,6 +17,20 @@ class MockRedisClient {
     this.lua.set('cmsgpack', msgpack(), cmsgpack);
   }
 
+  async flushDb() {
+    this.storage.forEach((value) => {
+      if (value.expireTimeout) {
+        clearTimeout(value.expireTimeout);
+      }
+    });
+
+    this.storage.clear();
+  }
+
+  FLUSHDB = this.flushDb;
+  flushAll = this.flushDb;
+  FLUSHALL = this.flushDb;
+
   // #region keys
   DEL = keys.del;
   del = keys.del;
