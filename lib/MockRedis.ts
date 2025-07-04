@@ -5,6 +5,7 @@ import * as keys from './keys';
 import * as strings from './strings';
 import * as sets from './sets';
 import * as evals from './eval';
+import { multi } from './multi';
 
 class MockRedisClient {
   protected readonly storage = new Map<string, RedisItem>();
@@ -61,6 +62,11 @@ class MockRedisClient {
   SCARD = sets.sCard;
   sCard = sets.sCard;
   // #endregion set
+
+  // #region multi
+  MULTI = multi;
+  multi = multi;
+  // #endregion multi
 }
 
 export type { MockRedisClient };

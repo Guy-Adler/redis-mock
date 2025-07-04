@@ -81,11 +81,17 @@ export function incr(
   callback?: Callback<number>
 ): Promise<number> | void {
   const redisValue = this.storage.get(key);
+
+  if (redisValue === undefined) {
+    this.set(key, '1', () => {});
+    return response(1, callback);
+  }
+
   if (!(redisValue instanceof RedisString)) {
     throw new Error(`Key ${key} is not a string`);
   }
   const newValue = +redisValue.value + 1;
-  if (Number.isInteger(newValue)) {
+  if (!Number.isInteger(newValue)) {
     throw new Error(`Key ${key} does not store a string representation of an integer`);
   }
 
@@ -102,11 +108,17 @@ export function decr(
   callback?: Callback<number>
 ): Promise<number> | void {
   const redisValue = this.storage.get(key);
+
+  if (redisValue === undefined) {
+    this.set(key, '-1', () => {});
+    return response(-1, callback);
+  }
+
   if (!(redisValue instanceof RedisString)) {
     throw new Error(`Key ${key} is not a string`);
   }
   const newValue = +redisValue.value - 1;
-  if (Number.isInteger(newValue)) {
+  if (!Number.isInteger(newValue)) {
     throw new Error(`Key ${key} does not store a string representation of an integer`);
   }
 

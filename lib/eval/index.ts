@@ -17,11 +17,11 @@ interface EvalOptions {
   arguments?: string[];
 }
 
-export async function evalsha(this: MockRedisClient, ...input: any[]) {
+export function evalsha(this: MockRedisClient, ...input: any[]) {
   throw new Error('NOSCRIPT');
 }
 
-export async function EVAL(this: MockRedisClient, script: string, options?: EvalOptions) {
+export function EVAL(this: MockRedisClient, script: string, options?: EvalOptions) {
   this.lua.set('KEYS', options?.keys ?? []);
   this.lua.set('ARGV', options?.arguments ?? []);
   return Redis.response(this.lua.run(script)[0]);
