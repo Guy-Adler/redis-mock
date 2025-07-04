@@ -3,6 +3,7 @@ import type { RedisItem } from './RedisItem';
 import { cjson, cmsgpack, redis, Lua } from './eval';
 import * as keys from './keys';
 import * as strings from './strings';
+import * as sets from './sets';
 import * as evals from './eval';
 
 class MockRedisClient {
@@ -49,6 +50,17 @@ class MockRedisClient {
   EVALSHA = evals.evalsha;
   evalsha = evals.evalsha;
   // #endregion eval
+
+  // #region set
+  SADD = sets.sAdd;
+  sAdd = sets.sAdd;
+  SREM = sets.sRem;
+  sRem = sets.sRem;
+  SMEMBERS = sets.sMembers;
+  sMembers = sets.sMembers;
+  SCARD = sets.sCard;
+  sCard = sets.sCard;
+  // #endregion set
 }
 
 export type { MockRedisClient };
