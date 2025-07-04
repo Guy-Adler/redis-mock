@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-export function encode(this: JSON, value: any) {
+export function encode(this: JSON, value: unknown) {
   return this.stringify(value);
 }
 

@@ -1,6 +1,8 @@
+import type { RedisArgument } from 'redis';
 import { MockRedisClient } from './MockRedis';
 import { RedisItem } from './RedisItem';
 import { Callback, response } from './utils/callbackOrPromise';
+import type { RedisVariadicArgument } from './types';
 
 class RedisSet extends RedisItem {
   constructor(public value: Set<string>) {
@@ -8,14 +10,19 @@ class RedisSet extends RedisItem {
   }
 }
 
-export function sAdd(key: string, members: string | string[], callback: Callback<number>): void;
-export function sAdd(key: string, members: string | string[]): Promise<number>;
+export function sAdd(
+  key: RedisArgument,
+  members: RedisVariadicArgument,
+  callback: Callback<number>
+): void;
+export function sAdd(key: RedisArgument, members: RedisVariadicArgument): Promise<number>;
 export function sAdd(
   this: MockRedisClient,
-  key: string,
-  members: string | string[],
+  key: RedisArgument,
+  members: RedisVariadicArgument,
   callback?: Callback<number>
 ): Promise<number> | void {
+  key = key.toString();
   let set = this.storage.get(key);
   if (set === undefined) {
     set = new RedisSet(new Set());
@@ -28,6 +35,7 @@ export function sAdd(
 
   members = Array.isArray(members) ? members : [members];
   const result = members.reduce((count, member) => {
+    member = member.toString();
     if (set.value.has(member)) {
       return count;
     }
@@ -42,15 +50,20 @@ export function sAdd(
   return response(result, callback);
 }
 
-export function sRem(key: string, members: string | string[], callback: Callback<number>): void;
-export function sRem(key: string, members: string | string[]): Promise<number>;
+export function sRem(
+  key: RedisArgument,
+  members: RedisVariadicArgument,
+  callback: Callback<number>
+): void;
+export function sRem(key: RedisArgument, members: RedisVariadicArgument): Promise<number>;
 export function sRem(
   this: MockRedisClient,
-  key: string,
-  members: string | string[],
+  key: RedisArgument,
+  members: RedisVariadicArgument,
   callback?: Callback<number>
 ): Promise<number> | void {
-  let set = this.storage.get(key);
+  key = key.toString();
+  const set = this.storage.get(key);
   if (set === undefined) {
     return response(0, callback);
   }
@@ -61,7 +74,7 @@ export function sRem(
 
   members = Array.isArray(members) ? members : [members];
   const result = members.reduce((count, member) => {
-    return count + +set.value.delete(member);
+    return count + +set.value.delete(member.toString());
   }, 0);
 
   if (set.value.size === 0) {
@@ -71,14 +84,15 @@ export function sRem(
   return response(result, callback);
 }
 
-export function sMembers(key: string, callback: Callback<string[]>): void;
-export function sMembers(key: string): Promise<string[]>;
+export function sMembers(key: RedisArgument, callback: Callback<string[]>): void;
+export function sMembers(key: RedisArgument): Promise<string[]>;
 export function sMembers(
   this: MockRedisClient,
-  key: string,
+  key: RedisArgument,
   callback?: Callback<string[]>
 ): Promise<string[]> | void {
-  let set = this.storage.get(key);
+  key = key.toString();
+  const set = this.storage.get(key);
   if (set === undefined) {
     return response([], callback);
   }
@@ -90,14 +104,15 @@ export function sMembers(
   return response([...set.value.keys()], callback);
 }
 
-export function sCard(key: string, callback: Callback<number>): void;
-export function sCard(key: string): Promise<number>;
+export function sCard(key: RedisArgument, callback: Callback<number>): void;
+export function sCard(key: RedisArgument): Promise<number>;
 export function sCard(
   this: MockRedisClient,
-  key: string,
+  key: RedisArgument,
   callback?: Callback<number>
 ): Promise<number> | void {
-  let set = this.storage.get(key);
+  key = key.toString();
+  const set = this.storage.get(key);
   if (set === undefined) {
     return response(0, callback);
   }

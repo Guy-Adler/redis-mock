@@ -25,6 +25,8 @@ class MockRedisClient {
     });
 
     this.storage.clear();
+
+    return 'OK';
   }
 
   FLUSHDB = this.flushDb;
@@ -38,6 +40,12 @@ class MockRedisClient {
   exists = keys.exists;
   EXPIRE = keys.expire;
   expire = keys.expire;
+  EXPIREAT = keys.expireAt;
+  expireAt = keys.expireAt;
+  PEXPIRE = keys.pExpire;
+  pExpire = keys.pExpire;
+  PEXPIREAT = keys.pExpireAt;
+  pExpireAt = keys.pExpireAt;
   TTL = keys.ttl;
   ttl = keys.ttl;
   KEYS = keys.keys;
@@ -62,8 +70,8 @@ class MockRedisClient {
   // #region eval
   EVAL = evals.EVAL;
   eval = evals.EVAL;
-  EVALSHA = evals.evalsha;
-  evalsha = evals.evalsha;
+  EVALSHA = evals.evalSha;
+  evalSha = evals.evalSha;
   // #endregion eval
 
   // #region set

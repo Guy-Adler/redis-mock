@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-export function response(value: any): any {
+export function response(value: unknown): unknown {
   switch (typeof value) {
     case 'string':
       return value;
@@ -16,10 +16,10 @@ export function response(value: any): any {
         return value.map(response);
       }
       if (value) {
-        if (typeof value.err === 'string') {
+        if ('err' in value && typeof value.err === 'string') {
           throw new Error(value.err);
         }
-        if (typeof value.ok === 'string') {
+        if ('ok' in value && typeof value.ok === 'string') {
           return value.ok;
         }
         return [];

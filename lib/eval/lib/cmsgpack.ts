@@ -11,7 +11,7 @@ import { returns } from '../utils/lua';
 // so use the safe base64 rather than the more accurate binary
 const ENCODING = 'base64';
 
-function mp_pack(msgpack: MessagePack, args: any[]): string {
+function mp_pack(msgpack: MessagePack, args: unknown[]): string {
   return msgpack.encode(args).toString(ENCODING);
 }
 
@@ -20,8 +20,8 @@ function mp_unpack_full(
   value: string,
   limit: number,
   offset: number
-): [number, ...any[]] {
-  const results = msgpack.decode(Buffer.from(value, ENCODING)) as any[];
+): [number, ...unknown[]] {
+  const results = msgpack.decode(Buffer.from(value, ENCODING)) as unknown[];
 
   if (limit < 0 || offset < 0) {
     throw RangeError(`Invalid request to unpack with offset of ${offset} and limit of ${limit}.`);
@@ -33,7 +33,7 @@ function mp_unpack_full(
 
 // https://github.com/antirez/lua-cmsgpack
 
-export function pack(this: MessagePack, ...args: any[]) {
+export function pack(this: MessagePack, ...args: unknown[]) {
   return mp_pack(this, args);
 }
 

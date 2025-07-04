@@ -1,7 +1,7 @@
 import type { MockRedisClient } from './MockRedis';
 
 type Batchify<T> = {
-  [K in keyof T]: T[K] extends (...args: infer A) => any
+  [K in keyof T]: T[K] extends (...args: infer A) => unknown
     ? (...args: A) => Batchify<T>
     : T[K] extends object
       ? Batchify<T[K]>
@@ -14,14 +14,14 @@ type RedisMultiClient = Batchify<Omit<MockRedisClient, 'multi'>>;
 
 type MethodCall = {
   path: string[];
-  args: any[];
+  args: unknown[];
 };
 
 export function multi(this: MockRedisClient): RedisMultiClient {
   const calls: MethodCall[] = [];
   const self = this;
 
-  function makeProxy(path: string[], obj: any) {
+  function makeProxy(path: string[], obj: unknown) {
     return new Proxy(
       {},
       {
@@ -31,7 +31,8 @@ export function multi(this: MockRedisClient): RedisMultiClient {
               const results = [] as unknown[];
 
               for (const call of calls) {
-                let ctx = self;
+                let ctx: unknown = self;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 let current: any = self;
 
                 for (const key of call.path) {
@@ -53,10 +54,10 @@ export function multi(this: MockRedisClient): RedisMultiClient {
             return exec;
           }
 
-          const next = obj?.[property];
+          const next = obj?.[property as keyof typeof obj];
 
           if (typeof next === 'function') {
-            return (...args: any[]) => {
+            return (...args: unknown[]) => {
               calls.push({
                 path: [...path, property.toString()],
                 args,

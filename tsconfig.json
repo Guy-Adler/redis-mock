@@ -21,7 +21,8 @@
         "lib/*"
       ]
     },
-    "sourceMap": true
+    "sourceMap": true,
+    "noImplicitAny": true,
   },
   "include": [
     "lib/**/*",

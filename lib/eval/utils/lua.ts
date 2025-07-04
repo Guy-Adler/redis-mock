@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*!
  * Copyright (c) Microsoft Corporation.
  * Licensed under the MIT License.
@@ -93,18 +94,18 @@ export class VM {
   }
 
   // Run a script on this Lua interop instance
-  run(script: string, ...args: any[]): any[] {
+  run(script: string, ...args: unknown[]): unknown[] {
     // Execute the script and convert the results to their JS equivalent
     return this.lua.execute(/* lua */ `return js.from(...)`, ...this.lua.execute(script, ...args));
   }
 
   // Set a global key on this Lua interop instance
-  set(key: string, value: any, proxy?: any) {
+  set(key: string, value: unknown, proxy?: unknown) {
     this.lua._G.set(key, proxy ? this.proxy(value, proxy) : this.value(value));
   }
 
   // If a proxy is provided, generate a Lua object with the shape of the proxy
-  private proxy(value: any, proxy: any) {
+  private proxy(value: unknown, proxy: any) {
     const members = Object.entries(proxy).map(([key, value]) =>
       typeof value === 'function'
         ? // Method calls are marshalled with the given value as 'this'
@@ -125,13 +126,13 @@ export class VM {
   }
 
   // If a proxy is not provided, just convert the value directly to Lua
-  private value(value: any) {
+  private value(value: unknown) {
     return this.lua.execute(/* lua */ `return js.to(...)`, value)[0];
   }
 }
 
 // Simulate Lua multi-return via unpacking the thrown array in js.call
-export function returns(...values: any[]) {
+export function returns(...values: unknown[]) {
   throw values;
 }
 

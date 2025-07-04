@@ -14,7 +14,7 @@ export function replicate_commands(this: MockRedisClient) {
   return true;
 }
 
-export function call(this: MockRedisClient, cmd: string, ...args: any[]) {
+export function call(this: MockRedisClient, cmd: string, ...args: unknown[]) {
   if (!(cmd.toLowerCase() in this)) {
     throw new Error(
       `Calling non existant function ${cmd.toLowerCase()} on ${this.constructor.name}`
@@ -23,12 +23,12 @@ export function call(this: MockRedisClient, cmd: string, ...args: any[]) {
   // The Lua VM can only handle synchronous calls, so we need to force the
   // Redis library (which may be using process ticks to simulate actual
   // network calls) to execute synchronously
-  const command: any = deasync(this[cmd.toLowerCase() as keyof MockRedisClient].bind(this));
+  const command = deasync(this[cmd.toLowerCase() as keyof MockRedisClient].bind(this));
   const result = command(...args);
   return result != null ? result : nil;
 }
 
-export function pcall(this: MockRedisClient, cmd: string, ...args: any[]) {
+export function pcall(this: MockRedisClient, cmd: string, ...args: unknown[]) {
   try {
     return call.call(this, cmd, ...args);
   } catch (err) {

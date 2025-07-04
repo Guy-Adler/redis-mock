@@ -1,45 +1,96 @@
+import type { RedisArgument } from 'redis';
+import type { RedisVariadicArgument } from './types';
 import { MockRedisClient } from './MockRedis';
 import { Callback, response } from './utils/callbackOrPromise';
 
-export function del(keys: string | string[], callback: Callback<number>): void;
-export function del(keys: string | string[]): Promise<number>;
+export function del(keys: RedisVariadicArgument, callback: Callback<number>): void;
+export function del(keys: RedisVariadicArgument): Promise<number>;
 export function del(
   this: MockRedisClient,
-  keys: string | string[],
+  keys: RedisVariadicArgument,
   callback?: Callback<number>
 ): void | Promise<number> {
   keys = Array.isArray(keys) ? keys : [keys];
 
   const result = keys.reduce((count, key) => {
-    return count + +this.storage.delete(key);
+    return count + +this.storage.delete(key.toString());
   }, 0);
 
   return response(result, callback);
 }
 
-export function exists(key: string, callback: Callback<number>): void;
-export function exists(key: string): Promise<number>;
+export function exists(key: RedisVariadicArgument, callback: Callback<number>): void;
+export function exists(key: RedisVariadicArgument): Promise<number>;
 export function exists(
   this: MockRedisClient,
-  key: string,
+  keys: RedisVariadicArgument,
   callback?: Callback<number>
 ): void | Promise<number> {
-  const result = +this.storage.has(key);
+  keys = Array.isArray(keys) ? keys : [keys];
+
+  const result = keys.reduce((count, key) => {
+    return count + +this.storage.has(key.toString());
+  }, 0);
 
   return response(result, callback);
 }
 
-export function expire(key: string, seconds: number, callback: Callback<number>): void;
-export function expire(key: string, seconds: number): Promise<number>;
+export function expire(
+  key: RedisArgument,
+  seconds: number,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
+export function expire(
+  key: RedisArgument,
+  seconds: number,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
 export function expire(
   this: MockRedisClient,
-  key: string,
+  key: RedisArgument,
   seconds: number,
+  mode: 'NX' | 'XX' | 'GT' | 'LT' | undefined = undefined,
   callback?: Callback<number>
 ): Promise<number> | void {
+  return this.pExpire(key, seconds * 1000, mode, callback);
+}
+
+export function pExpire(
+  key: RedisArgument,
+  ms: number,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
+export function pExpire(
+  key: RedisArgument,
+  ms: number,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
+export function pExpire(
+  this: MockRedisClient,
+  key: RedisArgument,
+  ms: number,
+  mode: 'NX' | 'XX' | 'GT' | 'LT' | undefined = undefined,
+  callback?: Callback<number>
+): Promise<number> | void {
+  key = key.toString();
   const redisItem = this.storage.get(key);
 
-  if (!redisItem) {
+  if (!redisItem || ms <= 0) {
+    return response(0, callback);
+  }
+
+  const newExpiryTime = Date.now() + ms;
+
+  const currentExpiry = redisItem.expireTime;
+
+  if (
+    (mode === 'NX' && currentExpiry !== null) ||
+    (mode === 'XX' && currentExpiry === null) ||
+    (mode === 'LT' && currentExpiry !== null && currentExpiry <= newExpiryTime) ||
+    (mode === 'GT' && (currentExpiry === null || currentExpiry >= newExpiryTime))
+  ) {
     return response(0, callback);
   }
 
@@ -47,8 +98,7 @@ export function expire(
     clearTimeout(redisItem.expireTimeout);
   }
 
-  const ms = seconds * 1000;
-  redisItem.expireTime = Date.now() + ms;
+  redisItem.expireTime = newExpiryTime;
   redisItem.expireTimeout = setTimeout(() => {
     this.storage.delete(key);
   }, ms);
@@ -56,14 +106,66 @@ export function expire(
   return response(1, callback);
 }
 
-export function ttl(key: string, callback: Callback<number>): void;
-export function ttl(key: string): Promise<number>;
-export function ttl(
+export function pExpireAt(
+  key: RedisArgument,
+  timestampMs: number | Date,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
+export function pExpireAt(
+  key: RedisArgument,
+  timestampMs: number | Date,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
+export function pExpireAt(
   this: MockRedisClient,
-  key: string,
+  key: RedisArgument,
+  timestampMs: number | Date,
+  mode: 'NX' | 'XX' | 'GT' | 'LT' | undefined = undefined,
   callback?: Callback<number>
 ): Promise<number> | void {
-  const redisItem = this.storage.get(key);
+  return this.pExpire(
+    key,
+    (typeof timestampMs === 'number' ? timestampMs : timestampMs.getTime()) - Date.now(),
+    mode,
+    callback
+  );
+}
+
+export function expireAt(
+  key: RedisArgument,
+  timestampSeconds: number | Date,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
+export function expireAt(
+  key: RedisArgument,
+  timestampSeconds: number | Date,
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
+export function expireAt(
+  this: MockRedisClient,
+  key: RedisArgument,
+  timestampSeconds: number | Date,
+  mode: 'NX' | 'XX' | 'GT' | 'LT' | undefined = undefined,
+  callback?: Callback<number>
+): Promise<number> | void {
+  return this.pExpireAt(
+    key,
+    typeof timestampSeconds === 'number' ? timestampSeconds * 1000 : timestampSeconds,
+    mode,
+    callback
+  );
+}
+
+export function ttl(key: RedisArgument, callback: Callback<number>): void;
+export function ttl(key: RedisArgument): Promise<number>;
+export function ttl(
+  this: MockRedisClient,
+  key: RedisArgument,
+  callback?: Callback<number>
+): Promise<number> | void {
+  const redisItem = this.storage.get(key.toString());
 
   if (!redisItem) {
     return response(-2, callback);
@@ -80,7 +182,7 @@ export function ttl(
 
 function patternToRegex(pattern: string) {
   function process_plain(start: number, length: number) {
-    var plain = pattern.slice(start, start + length);
+    let plain = pattern.slice(start, start + length);
     plain = plain.replace(/(\(|\)|\\|\.|\^|\$|\||\+)/gi, function (spec) {
       return '\\' + spec;
     });
@@ -99,7 +201,7 @@ function patternToRegex(pattern: string) {
       parts.push(process_plain(currentPos, matches.index - currentPos));
     }
     const groups = matches[1].split('');
-    for (var i in groups) {
+    for (const i in groups) {
       groups[i] = groups[i].replace(/(\(|\)|\\|\.|\^|\$|\||\?|\+|\*)/gi, function (spec) {
         return '\\' + spec;
       });
@@ -116,14 +218,14 @@ function patternToRegex(pattern: string) {
   return new RegExp(parts.join(''));
 }
 
-export function keys(pattern: string, callback: Callback<string[]>): void;
-export function keys(pattern: string): Promise<string[]>;
+export function keys(pattern: RedisArgument, callback: Callback<string[]>): void;
+export function keys(pattern: RedisArgument): Promise<string[]>;
 export function keys(
   this: MockRedisClient,
-  pattern: string,
+  pattern: RedisArgument,
   callback?: Callback<string[]>
 ): Promise<string[]> | void {
-  const regex = patternToRegex(pattern);
+  const regex = patternToRegex(pattern.toString());
 
   const result = Array.from(this.storage.keys()).filter((key) => regex.test(key));
   return response(result, callback);
