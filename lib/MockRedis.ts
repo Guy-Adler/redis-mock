@@ -1,4 +1,5 @@
 import msgpack from 'msgpack5';
+import EventEmitter from 'events';
 import type { RedisItem } from './RedisItem';
 import { cjson, cmsgpack, redis, Lua } from './eval';
 import * as keys from './keys';
@@ -7,16 +8,24 @@ import * as sets from './sets';
 import * as evals from './eval';
 import * as json from './json';
 import { multi } from './multi';
+import { RedisClientOptions } from 'redis';
 
-class MockRedisClient {
+class MockRedisClient extends EventEmitter {
   protected readonly storage = new Map<string, RedisItem>();
   protected readonly lua = new Lua.VM();
 
-  constructor() {
+  constructor(public readonly options: RedisClientOptions) {
+    super();
     this.lua.set('redis', this, redis);
     this.lua.set('cjson', JSON, cjson);
     this.lua.set('cmsgpack', msgpack(), cmsgpack);
   }
+
+  async connect() {
+    return this;
+  }
+
+  async close() {}
 
   async flushDb() {
     this.storage.forEach((value) => {

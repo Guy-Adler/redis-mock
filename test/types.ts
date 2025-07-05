@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import type { RedisClientType } from 'redis';
 import { MockRedisClient } from '../lib';
+import EventEmitter from 'events';
 
 type MethodPath<Prefix extends string, Name extends string> = Prefix extends ''
   ? Name
@@ -26,23 +27,27 @@ type MethodSignatures<T> = {
   [K in ExtractMethodPaths<T>]: Lookup<T, K> extends Function ? Lookup<T, K> : never;
 };
 type RealSignatures = MethodSignatures<RedisClientType>;
-type MockSignatures = MethodSignatures<MockRedisClient>;
+// Do not compare event emitter, since they will never be equal (they are not the same class)
+type MockSignatures = MethodSignatures<Omit<MockRedisClient, keyof EventEmitter>>;
 
 type FullDiff = {
-  [K in keyof MockSignatures as Uppercase<K>]: K extends keyof RealSignatures
+  [K in keyof MockSignatures & string]: K extends keyof RealSignatures
     ? RealSignatures[K] extends MockSignatures[K]
       ? MockSignatures[K] extends RealSignatures[K]
         ? never
-        : Uppercase<K> // valid code in mock isn't valid in node-redis
-      : Uppercase<K> // valid code in node-redis isn't valid in mock
-    : Uppercase<K>; // doesn't exist in node-redis
-}[Uppercase<keyof MockSignatures>];
+        : K // valid code in mock isn't valid in node-redis
+      : K // valid code in node-redis isn't valid in mock
+    : K; // doesn't exist in node-redis
+}[keyof MockSignatures & string];
 
 /**
  * Some commands simply can not have the same type in a reasonable way.
  * After manual testing, we can choose to ignore them.
  */
-type ImpossibleFunctions = 'MULTI';
+type ImpossibleFunctions =
+  | 'connect' // we return a different client which isn't fully compliant
+  | 'multi'
+  | 'MULTI';
 
 type Diff = Exclude<FullDiff, ImpossibleFunctions>;
 

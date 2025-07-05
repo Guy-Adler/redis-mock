@@ -5,7 +5,7 @@ import { Callback, response } from './utils/callbackOrPromise';
 import jsonpath from 'jsonpath';
 import { MockRedisClient } from './MockRedis';
 
-export class RedisJSON extends RedisItem {
+class RedisJSON extends RedisItem {
   constructor(public value: RedisJSONType) {
     super();
   }
