@@ -3,8 +3,8 @@ import type { RedisVariadicArgument } from './types';
 import { MockRedisClient } from './MockRedis';
 import { Callback, response } from './utils/callbackOrPromise';
 
-export function del(keys: RedisVariadicArgument, callback: Callback<number>): void;
 export function del(keys: RedisVariadicArgument): Promise<number>;
+export function del(keys: RedisVariadicArgument, callback: Callback<number>): void;
 export function del(
   this: MockRedisClient,
   keys: RedisVariadicArgument,
@@ -19,8 +19,8 @@ export function del(
   return response(result, callback);
 }
 
-export function exists(key: RedisVariadicArgument, callback: Callback<number>): void;
 export function exists(key: RedisVariadicArgument): Promise<number>;
+export function exists(key: RedisVariadicArgument, callback: Callback<number>): void;
 export function exists(
   this: MockRedisClient,
   keys: RedisVariadicArgument,
@@ -38,14 +38,14 @@ export function exists(
 export function expire(
   key: RedisArgument,
   seconds: number,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
-  callback?: Callback<number>
-): void;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
 export function expire(
   key: RedisArgument,
   seconds: number,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
-): Promise<number>;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
 export function expire(
   this: MockRedisClient,
   key: RedisArgument,
@@ -59,14 +59,14 @@ export function expire(
 export function pExpire(
   key: RedisArgument,
   ms: number,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
-  callback?: Callback<number>
-): void;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
 export function pExpire(
   key: RedisArgument,
   ms: number,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
-): Promise<number>;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
 export function pExpire(
   this: MockRedisClient,
   key: RedisArgument,
@@ -109,14 +109,14 @@ export function pExpire(
 export function pExpireAt(
   key: RedisArgument,
   timestampMs: number | Date,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
-  callback?: Callback<number>
-): void;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
 export function pExpireAt(
   key: RedisArgument,
   timestampMs: number | Date,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
-): Promise<number>;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
 export function pExpireAt(
   this: MockRedisClient,
   key: RedisArgument,
@@ -135,14 +135,14 @@ export function pExpireAt(
 export function expireAt(
   key: RedisArgument,
   timestampSeconds: number | Date,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
-  callback?: Callback<number>
-): void;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
+): Promise<number>;
 export function expireAt(
   key: RedisArgument,
   timestampSeconds: number | Date,
-  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined
-): Promise<number>;
+  mode?: 'NX' | 'XX' | 'GT' | 'LT' | undefined,
+  callback?: Callback<number>
+): void;
 export function expireAt(
   this: MockRedisClient,
   key: RedisArgument,
@@ -158,8 +158,8 @@ export function expireAt(
   );
 }
 
-export function ttl(key: RedisArgument, callback: Callback<number>): void;
 export function ttl(key: RedisArgument): Promise<number>;
+export function ttl(key: RedisArgument, callback: Callback<number>): void;
 export function ttl(
   this: MockRedisClient,
   key: RedisArgument,
@@ -218,8 +218,8 @@ function patternToRegex(pattern: string) {
   return new RegExp(parts.join(''));
 }
 
-export function keys(pattern: RedisArgument, callback: Callback<string[]>): void;
 export function keys(pattern: RedisArgument): Promise<string[]>;
+export function keys(pattern: RedisArgument, callback: Callback<string[]>): void;
 export function keys(
   this: MockRedisClient,
   pattern: RedisArgument,

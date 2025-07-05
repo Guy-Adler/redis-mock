@@ -10,12 +10,12 @@ class RedisSet extends RedisItem {
   }
 }
 
+export function sAdd(key: RedisArgument, members: RedisVariadicArgument): Promise<number>;
 export function sAdd(
   key: RedisArgument,
   members: RedisVariadicArgument,
   callback: Callback<number>
 ): void;
-export function sAdd(key: RedisArgument, members: RedisVariadicArgument): Promise<number>;
 export function sAdd(
   this: MockRedisClient,
   key: RedisArgument,
@@ -50,12 +50,12 @@ export function sAdd(
   return response(result, callback);
 }
 
+export function sRem(key: RedisArgument, members: RedisVariadicArgument): Promise<number>;
 export function sRem(
   key: RedisArgument,
   members: RedisVariadicArgument,
   callback: Callback<number>
 ): void;
-export function sRem(key: RedisArgument, members: RedisVariadicArgument): Promise<number>;
 export function sRem(
   this: MockRedisClient,
   key: RedisArgument,
@@ -84,8 +84,8 @@ export function sRem(
   return response(result, callback);
 }
 
-export function sMembers(key: RedisArgument, callback: Callback<string[]>): void;
 export function sMembers(key: RedisArgument): Promise<string[]>;
+export function sMembers(key: RedisArgument, callback: Callback<string[]>): void;
 export function sMembers(
   this: MockRedisClient,
   key: RedisArgument,
@@ -104,8 +104,8 @@ export function sMembers(
   return response([...set.value.keys()], callback);
 }
 
-export function sCard(key: RedisArgument, callback: Callback<number>): void;
 export function sCard(key: RedisArgument): Promise<number>;
+export function sCard(key: RedisArgument, callback: Callback<number>): void;
 export function sCard(
   this: MockRedisClient,
   key: RedisArgument,

@@ -54,14 +54,14 @@ interface SetOptions {
 export function set(
   key: RedisArgument,
   value: number | RedisArgument,
-  options?: SetOptions | undefined,
-  callback?: Callback<string | null>
-): void;
+  options?: SetOptions | undefined
+): Promise<string | null>;
 export function set(
   key: RedisArgument,
   value: number | RedisArgument,
-  options?: SetOptions | undefined
-): Promise<string | null>;
+  options?: SetOptions | undefined,
+  callback?: Callback<string | null>
+): void;
 export function set(
   this: MockRedisClient,
   key: RedisArgument,
@@ -149,8 +149,8 @@ export function set(
   return response(options?.GET ? prevValue : 'OK', callback);
 }
 
-export function setNX(key: RedisArgument, value: RedisArgument, callback: Callback<number>): void;
 export function setNX(key: RedisArgument, value: RedisArgument): Promise<number>;
+export function setNX(key: RedisArgument, value: RedisArgument, callback: Callback<number>): void;
 export function setNX(
   this: MockRedisClient,
   key: RedisArgument,
@@ -168,8 +168,8 @@ export function setNX(
   return response(1, callback);
 }
 
-export function get(key: RedisArgument, callback: Callback<string | null>): void;
 export function get(key: RedisArgument): Promise<string | null>;
+export function get(key: RedisArgument, callback: Callback<string | null>): void;
 export function get(
   this: MockRedisClient,
   key: RedisArgument,
@@ -183,8 +183,8 @@ export function get(
   throw new Error(`Key ${key} is not a string`);
 }
 
-export function mGet(keys: RedisArgument[], callback: Callback<Array<string | null>>): void;
 export function mGet(keys: RedisArgument[]): Promise<Array<string | null>>;
+export function mGet(keys: RedisArgument[], callback: Callback<Array<string | null>>): void;
 export function mGet(
   this: MockRedisClient,
   keys: RedisArgument[],
@@ -198,8 +198,8 @@ export function mGet(
   return response(result, callback);
 }
 
-export function incr(key: RedisArgument, callback: Callback<number>): void;
 export function incr(key: RedisArgument): Promise<number>;
+export function incr(key: RedisArgument, callback: Callback<number>): void;
 export function incr(
   this: MockRedisClient,
   key: RedisArgument,
@@ -226,8 +226,8 @@ export function incr(
   return response(newValue, callback);
 }
 
-export function decr(key: RedisArgument, callback: Callback<number>): void;
 export function decr(key: RedisArgument): Promise<number>;
+export function decr(key: RedisArgument, callback: Callback<number>): void;
 export function decr(
   this: MockRedisClient,
   key: RedisArgument,
