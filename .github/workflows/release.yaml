@@ -35,16 +35,18 @@ jobs:
           echo "PACKAGE_NAME=$NAME" >> $GITHUB_OUTPUT
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Move the .tgz somewhere predictable
+      - name: Create .tgz with all dependencies
+        env:
+          PACKAGE_NAME: ${{ steps.get_info.outputs.PACKAGE_NAME }}
+          PACKAGE_VERSION: ${{ steps.get_info.outputs.PACKAGE_VERSION }}
         run: |
           mkdir tmp
           cd tmp
           npm init -y
-          echo "../${steps.get_info.outputs.PACKAGE_NAME}-${steps.get_info.outputs.PACKAGE_VERSION}.tgz"
-          npm i "../${steps.get_info.outputs.PACKAGE_NAME}-${steps.get_info.outputs.PACKAGE_VERSION}.tgz"
+          npm i "../${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz"
           rm ./node_modules/.package-lock.json
-          echo "{ \"name\": \"${steps.get_info.outputs.PACKAGE_NAME}\", \"version\": \"${steps.get_info.outputs.PACKAGE_VERSION}\" }" > ./node_modules/packageInfo.json
-          tar -czf ${steps.get_info.outputs.PACKAGE_NAME}@${steps.get_info.outputs.PACKAGE_VERSION}.tgz ./node_modules
+          echo "{ \"name\": \"${PACKAGE_NAME}\", \"version\": \"${PACKAGE_VERSION}\" }" > ./node_modules/packageInfo.json
+          tar -czf ${PACKAGE_NAME}@${PACKAGE_VERSION}.tgz ./node_modules
 
       - name: Create GitHub Release
         id: create_release
