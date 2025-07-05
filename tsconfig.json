@@ -23,6 +23,7 @@
     },
     "sourceMap": true,
     "noImplicitAny": true,
+    "declaration": true
   },
   "include": [
     "lib/**/*",

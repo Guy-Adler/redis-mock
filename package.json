@@ -11,10 +11,19 @@
     "format": "prettier --write \"lib/**/*.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "redis",
+    "mock",
+    "redis-mock",
+    "mock-redis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Guy-Adler/redis-mock"
+  },
+  "author": "Guy Adler <guyadler2005@gmail.com>",
+  "license": "MIT",
+  "description": "A mock for redis@^5",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.30.1",
