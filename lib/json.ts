@@ -22,18 +22,20 @@ export function get(
 ): Promise<RedisJSONType>;
 export function get(
   key: RedisArgument,
-  options?:
+  options:
     | {
         /** Needs to be a valid JSONPath (mock does not support legacy Redis path) */
         path?: RedisVariadicArgument;
       }
     | undefined,
-  callback?: Callback<RedisJSONType>
+  callback: Callback<RedisJSONType>
 ): void;
+export function get(key: RedisArgument, callback: Callback<RedisJSONType>): void;
 export function get(
   this: MockRedisClient,
   key: RedisArgument,
   options:
+    | Callback<RedisJSONType>
     | {
         /** Needs to be a valid JSONPath (mock does not support legacy Redis path) */
         path?: RedisVariadicArgument;
@@ -42,8 +44,9 @@ export function get(
   callback?: Callback<RedisJSONType>
 ): Promise<RedisJSONType> | void {
   key = key.toString();
+  callback = callback ?? (typeof options === 'function' ? options : undefined);
+  options = typeof options === 'function' ? undefined : options;
   const value = this.storage.get(key);
-
   if (value === undefined) {
     return response(null, callback);
   } else if (!(value instanceof RedisJSON)) {
@@ -99,8 +102,15 @@ export function set(
   /** Needs to be a valid JSONPath (mock does not support legacy Redis path) */
   path: RedisArgument,
   json: RedisJSONType,
-  options?: JsonSetOptions | undefined,
-  callback?: Callback<'OK' | null>
+  options: JsonSetOptions | undefined,
+  callback: Callback<'OK' | null>
+): void;
+export function set(
+  key: RedisArgument,
+  /** Needs to be a valid JSONPath (mock does not support legacy Redis path) */
+  path: RedisArgument,
+  json: RedisJSONType,
+  callback: Callback<'OK' | null>
 ): void;
 export function set(
   this: MockRedisClient,
@@ -108,11 +118,13 @@ export function set(
   /** Needs to be a valid JSONPath (mock does not support legacy Redis path) */
   path: RedisArgument,
   json: RedisJSONType,
-  options: JsonSetOptions | undefined = undefined,
+  options: Callback<'OK' | null> | JsonSetOptions | undefined = undefined,
   callback?: Callback<'OK' | null>
 ): Promise<'OK' | null> | void {
   key = key.toString();
   path = path.toString();
+  callback = callback ?? (typeof options === 'function' ? options : undefined);
+  options = typeof options === 'function' ? undefined : options;
   const value = this.storage.get(key);
 
   if (value !== undefined && !(value instanceof RedisJSON)) {

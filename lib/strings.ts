@@ -59,17 +59,24 @@ export function set(
 export function set(
   key: RedisArgument,
   value: number | RedisArgument,
-  options?: SetOptions | undefined,
-  callback?: Callback<string | null>
+  callback: Callback<string | null>
+): void;
+export function set(
+  key: RedisArgument,
+  value: number | RedisArgument,
+  options: SetOptions | undefined,
+  callback: Callback<string | null>
 ): void;
 export function set(
   this: MockRedisClient,
   key: RedisArgument,
   value: number | RedisArgument,
-  options: SetOptions | undefined = undefined,
+  options: Callback<string | null> | SetOptions | undefined = undefined,
   callback?: Callback<string | null>
 ): Promise<string | null> | void {
   key = key.toString();
+  callback = callback ?? (typeof options === 'function' ? options : undefined);
+  options = typeof options === 'function' ? undefined : options;
   const currentValue = this.storage.get(key);
 
   if (!(currentValue instanceof RedisString) && options?.GET) {

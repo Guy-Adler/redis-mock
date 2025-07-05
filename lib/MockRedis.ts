@@ -14,7 +14,7 @@ class MockRedisClient extends EventEmitter {
   protected readonly storage = new Map<string, RedisItem>();
   protected readonly lua = new Lua.VM();
 
-  constructor(public readonly options: RedisClientOptions) {
+  constructor(public readonly options?: RedisClientOptions) {
     super();
     this.lua.set('redis', this, redis);
     this.lua.set('cjson', JSON, cjson);
@@ -113,6 +113,6 @@ class MockRedisClient extends EventEmitter {
 
 export type { MockRedisClient };
 
-export function createClient() {
-  return new MockRedisClient();
+export function createClient(options?: RedisClientOptions) {
+  return new MockRedisClient(options);
 }
