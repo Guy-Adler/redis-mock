@@ -48,13 +48,17 @@ type Diff = Exclude<FullDiff, ImpossibleFunctions>;
 
 type MustBeNever<T extends never> = T;
 export type Expect = MustBeNever<Diff>;
+export type MissingMethods = Uppercase<
+  Exclude<keyof RealSignatures & string, keyof MockSignatures & string>
+>;
 
 // Drilldown:
 type BadKeyFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/keys')>>;
 type BadSetsFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/sets')>>;
 type BadStringsFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/strings')>>;
 type BadEvalFunctions = Extract<Diff, Uppercase<keyof typeof import('../lib/eval')>>;
+type BadJSONFunctions = Extract<Diff, `JSON.${Uppercase<keyof typeof import('../lib/json')>}`>;
 type OtherBadFunctions = Exclude<
   Diff,
-  BadKeyFunctions | BadSetsFunctions | BadStringsFunctions | BadEvalFunctions
+  BadKeyFunctions | BadSetsFunctions | BadStringsFunctions | BadEvalFunctions | BadJSONFunctions
 >;

@@ -5,6 +5,7 @@ import * as keys from './keys';
 import * as strings from './strings';
 import * as sets from './sets';
 import * as evals from './eval';
+import * as json from './json';
 import { multi } from './multi';
 
 class MockRedisClient {
@@ -89,6 +90,16 @@ class MockRedisClient {
   MULTI = multi;
   multi = multi;
   // #endregion multi
+
+  // #region json
+  json = {
+    // Need to bind all methods to `this`, otherwise their `this` is the object.
+    GET: json.get.bind(this) as typeof json.get,
+    get: json.get.bind(this) as typeof json.get,
+    SET: json.set.bind(this) as typeof json.set,
+    set: json.set.bind(this) as typeof json.set,
+  };
+  // #endregion json
 }
 
 export type { MockRedisClient };
