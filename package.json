@@ -21,6 +21,9 @@
     "type": "git",
     "url": "https://github.com/Guy-Adler/redis-mock"
   },
+  "files": [
+    "dist"
+  ],
   "author": "Guy Adler <guyadler2005@gmail.com>",
   "license": "MIT",
   "description": "A mock for redis@^5",
