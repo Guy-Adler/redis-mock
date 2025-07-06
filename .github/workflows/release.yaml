@@ -47,6 +47,9 @@ jobs:
           echo "{ \"name\": \"${PACKAGE_NAME}\", \"version\": \"${PACKAGE_VERSION}\" }" > ./node_modules/packageInfo.json
           tar -czf ${PACKAGE_NAME}@${PACKAGE_VERSION}.tgz ./node_modules
 
+      - name: debug
+        run: ls -l ./tmp
+
       - name: Get release
         id: get_release
         uses: bruceadams/get-release@v1.3.2
