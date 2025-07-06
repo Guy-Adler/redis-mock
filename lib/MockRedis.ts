@@ -8,7 +8,7 @@ import * as sets from './sets';
 import * as evals from './eval';
 import * as json from './json';
 import { multi } from './multi';
-import { RedisClientOptions } from 'redis';
+import type { RedisClientOptions, RedisPoolOptions } from 'redis';
 
 class MockRedisClient extends EventEmitter {
   protected readonly storage = new Map<string, RedisItem>();
@@ -115,4 +115,11 @@ export type { MockRedisClient };
 
 export function createClient(options?: RedisClientOptions) {
   return new MockRedisClient(options);
+}
+
+export function createClientPool(
+  clientOptions?: RedisClientOptions,
+  _options?: Partial<RedisPoolOptions>
+) {
+  return new MockRedisClient(clientOptions);
 }
