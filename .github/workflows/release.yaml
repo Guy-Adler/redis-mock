@@ -45,7 +45,7 @@ jobs:
           npm i "../${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz"
           rm ./node_modules/.package-lock.json
           echo "{ \"name\": \"${PACKAGE_NAME}\", \"version\": \"${PACKAGE_VERSION}\" }" > ./node_modules/packageInfo.json
-          tar -czf ${PACKAGE_NAME}@${PACKAGE_VERSION}.tgz ./node_modules
+          tar -czf ${PACKAGE_NAME}@${PACKAGE_VERSION}.tgz -C ./node_modules .
 
       - name: Get release
         id: get_release
