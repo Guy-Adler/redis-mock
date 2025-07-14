@@ -143,13 +143,13 @@ export function set(
       }[options.expiration.type];
       expire(key, options.expiration.value, undefined, () => {});
     } else if (options?.EX !== undefined) {
-      this.expire(key, options.EX);
+      this.expire(key, options.EX, undefined, () => {});
     } else if (options?.PX !== undefined) {
-      this.pExpire(key, options.PX);
+      this.pExpire(key, options.PX, undefined, () => {});
     } else if (options?.EXAT !== undefined) {
-      this.expireAt(key, options.EXAT);
+      this.expireAt(key, options.EXAT, undefined, () => {});
     } else if (options?.PXAT !== undefined) {
-      this.pExpireAt(key, options.PXAT);
+      this.pExpireAt(key, options.PXAT, undefined, () => {});
     }
   }
 

@@ -15,17 +15,21 @@ export function replicate_commands(this: MockRedisClient) {
 }
 
 export function call(this: MockRedisClient, cmd: string, ...args: unknown[]) {
-  const func = cmd
-    .toLowerCase()
-    .split('.')
-    .reduce((acc, key) => {
+  const func = cmd.split('.').reduce((acc, key) => {
+    const properties = Object.getOwnPropertyNames(acc ?? {});
+    if (properties.includes(key)) {
       return acc?.[key as keyof typeof acc];
-    }, this as unknown) as unknown as undefined | ((...args: unknown[]) => unknown);
+    } else if (properties.includes(key.toUpperCase())) {
+      return acc?.[key.toUpperCase() as keyof typeof acc];
+    } else if (properties.includes(key.toLowerCase())) {
+      return acc?.[key.toLowerCase() as keyof typeof acc];
+    }
+
+    return acc?.[key as keyof typeof acc];
+  }, this as unknown) as unknown as undefined | ((...args: unknown[]) => unknown);
 
   if (func === undefined) {
-    throw new Error(
-      `Calling non existant function ${cmd.toLowerCase()} on ${this.constructor.name}`
-    );
+    throw new Error(`Calling non existant function ${cmd} on ${this.constructor.name}`);
   }
   // The Lua VM can only handle synchronous calls, so we need to force the
   // Redis library (which may be using process ticks to simulate actual

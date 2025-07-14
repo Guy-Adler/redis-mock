@@ -54,8 +54,8 @@ export function expire(
   mode: Callback<number> | 'NX' | 'XX' | 'GT' | 'LT' | undefined = undefined,
   callback?: Callback<number>
 ): Promise<number> | void {
-  mode = typeof mode === 'function' ? undefined : mode;
   callback = callback ?? (typeof mode === 'function' ? mode : undefined);
+  mode = typeof mode === 'function' ? undefined : mode;
   return this.pExpire(key, seconds * 1000, mode, callback!);
 }
 
@@ -79,8 +79,8 @@ export function pExpire(
   callback?: Callback<number>
 ): Promise<number> | void {
   key = key.toString();
-  mode = typeof mode === 'function' ? undefined : mode;
   callback = callback ?? (typeof mode === 'function' ? mode : undefined);
+  mode = typeof mode === 'function' ? undefined : mode;
   const redisItem = this.storage.get(key);
 
   if (!redisItem || ms <= 0) {
@@ -135,8 +135,8 @@ export function pExpireAt(
   mode: Callback<number> | 'NX' | 'XX' | 'GT' | 'LT' | undefined = undefined,
   callback?: Callback<number>
 ): Promise<number> | void {
-  mode = typeof mode === 'function' ? undefined : mode;
   callback = callback ?? (typeof mode === 'function' ? mode : undefined);
+  mode = typeof mode === 'function' ? undefined : mode;
 
   return this.pExpire(
     key,
@@ -169,8 +169,8 @@ export function expireAt(
   mode: Callback<number> | 'NX' | 'XX' | 'GT' | 'LT' | undefined = undefined,
   callback?: Callback<number>
 ): Promise<number> | void {
-  mode = typeof mode === 'function' ? undefined : mode;
   callback = callback ?? (typeof mode === 'function' ? mode : undefined);
+  mode = typeof mode === 'function' ? undefined : mode;
   return this.pExpireAt(
     key,
     typeof timestampSeconds === 'number' ? timestampSeconds * 1000 : timestampSeconds,
